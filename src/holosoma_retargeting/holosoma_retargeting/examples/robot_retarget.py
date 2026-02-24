@@ -233,8 +233,8 @@ def load_motion_data(
             default_human_height = motion_data_config.default_human_height or 1.78
             smpl_scale = constants.ROBOT_HEIGHT / default_human_height
         elif data_format == "smplx":
-            npz_file = data_path / f"{task_name}.npz"
-
+            # npz_file = data_path / f"{task_name}.npz"
+            npz_file = data_path
             human_data = np.load(str(npz_file))
             human_joints = human_data["global_joint_positions"]
             human_height = human_data["height"]
@@ -613,6 +613,10 @@ def main(cfg: RetargetingConfig) -> None:
     save_dir = cfg.save_dir if cfg.save_dir is not None else Path(DEFAULT_SAVE_DIRS[task_type].format(robot=robot))
     data_path = cfg.data_path
 
+    data_name = Path(*Path(data_path).parts[-3:])
+    dest_res_path = Path(cfg.save_dir) / str(data_name)
+    dest_res_path.parent.mkdir(parents=True, exist_ok=True)
+
     os.makedirs(save_dir, exist_ok=True)
     logger.info("Task: %s, Type: %s, Format: %s", task_name, task_type, data_format)
     logger.info("Data path: %s, Save dir: %s", data_path, save_dir)
@@ -698,7 +702,7 @@ def main(cfg: RetargetingConfig) -> None:
         foot_sticking_sequences[0][toe_names[1]] = False
 
     # Determine output path
-    dest_res_path = determine_output_path(task_type, save_dir, task_name, cfg.augmentation)
+    # dest_res_path = determine_output_path(task_type, save_dir, task_name, cfg.augmentation)
 
     # Retarget motion
     logger.info("Starting retargeting...")

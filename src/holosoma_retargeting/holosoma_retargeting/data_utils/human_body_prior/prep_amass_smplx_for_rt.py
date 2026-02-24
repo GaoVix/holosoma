@@ -201,6 +201,18 @@ def compute_height(bm_dict, betas, gender):
 
     return max_z - min_z
 
+def smpl_to_smplx(key_name):
+    key_name = key_name.replace("SSM_synced", "SSM")
+    key_name = key_name.replace("MPI_HDM05", "HDM05")
+    key_name = key_name.replace("MPI_mosh", "MoSh")
+    key_name = key_name.replace("MPI_Limits", "PosePrior")
+    key_name = key_name.replace("TCD_handMocap", "TCDHands")
+    key_name = key_name.replace("Transitions_mocap", "Transitions")
+    key_name = key_name.replace("DFaust_67", "DFaust")
+    key_name = key_name.replace("BioMotionLab_NTroje", "BMLrub")
+    key_name = key_name.replace("EyesJapanDataset","Eyes_Japan_Dataset")
+
+    return key_name
 
 def get_npz_files(amass_root_folder, subdataset_folder=None):
     """
@@ -225,6 +237,15 @@ def get_npz_files(amass_root_folder, subdataset_folder=None):
         npz_files = [str(p) for p in amass_path.rglob("*_stageii.npz")]
     return npz_files
 
+def load_motion_list(txt_path: Path):
+    """Load motion identifiers from txt file."""
+    entries = []
+    with open(txt_path, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                entries.append(line)
+    return entries
 
 @dataclass
 class Config:
@@ -239,6 +260,8 @@ class Config:
     model_root_folder: str = "/home/ubuntu/datasets/rt_ori_human_data/smpl_all_models"
     """Root folder containing SMPLX model files."""
 
+    motion_list : str = '/mnt/Exp_HDD/projects/spider_n/spider/test.txt'
+
     subdataset_folder: str | None = None
     """Optional subdataset folder name. If specified, only loads npz files from
     amass_root_folder/subdataset_folder/*/*.npz. If None, loads from
@@ -247,20 +270,32 @@ class Config:
 
 def main(cfg: Config):
     # Get all the npz file paths in the amass-smplx folder
-    npz_file_paths = get_npz_files(cfg.amass_root_folder, cfg.subdataset_folder)
-
+    # npz_file_paths = get_npz_files(cfg.amass_root_folder, cfg.subdataset_folder)
+    motion_lists = load_motion_list(cfg.motion_list)
     # Prepare desired output folder
     os.makedirs(cfg.output_folder, exist_ok=True)
 
     bm_dict = prep_smplx_model(cfg.model_root_folder)
 
     num_body_joints = 22
-    for npz_file_path in npz_file_paths:
+    # for npz_file_path in npz_file_paths:
+    for motion_path in motion_lists:
 
-        npz_path = Path(npz_file_path)
-        subset_data_name = npz_path.parts[-3]
-        sub_name = npz_path.parts[-2]
-        output_file_path = os.path.join(cfg.output_folder, subset_data_name + "_" + sub_name + "_" + npz_path.name)
+        motion_path = smpl_to_smplx(motion_path).replace('_poses.', '_stageii.').replace(".npy", ".pkl").replace(".pkl", ".npz").replace(' ', '_')
+
+        motion_path_rel = Path(*Path(motion_path).parts[-3:])
+        npz_file_path = Path(cfg.amass_root_folder) / motion_path_rel
+
+        output_file_path = Path(cfg.output_folder) / motion_path_rel
+        output_file_path.parent.mkdir(parents=True, exist_ok=True)
+        if output_file_path.exists():
+            print(f'Found retargeted data at {output_file_path}, continue ...')
+            continue
+
+        # npz_path = Path(npz_file_path)
+        # subset_data_name = npz_path.parts[-3]
+        # sub_name = npz_path.parts[-2]
+        # output_file_path = os.path.join(cfg.output_folder, subset_data_name + "_" + sub_name + "_" + npz_path.name)
 
         data = load_ori_npz_file(npz_file_path)
         # gender = data["gender"]

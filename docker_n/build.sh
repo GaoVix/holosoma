@@ -1,0 +1,1 @@
+docker build --network host -t holosoma -f docker_n/Dockerfile .
