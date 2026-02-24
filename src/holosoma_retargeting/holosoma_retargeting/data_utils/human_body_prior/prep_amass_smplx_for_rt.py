@@ -289,7 +289,7 @@ def main(cfg: Config):
         output_file_path = Path(cfg.output_folder) / motion_path_rel
         output_file_path.parent.mkdir(parents=True, exist_ok=True)
         if output_file_path.exists():
-            print(f'Found retargeted data at {output_file_path}, continue ...')
+            print(f'Found processed data at {output_file_path}, continue ...')
             continue
 
         # npz_path = Path(npz_file_path)
