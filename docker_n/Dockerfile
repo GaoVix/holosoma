@@ -21,7 +21,7 @@ COPY . /app
 
 RUN pip install -e /app/src/holosoma_retargeting
 
-RUN pip install torch tqdm dotmap PyYAML omegaconf loguru
+RUN pip install tqdm dotmap PyYAML omegaconf loguru
 
 RUN pip install -e /app/src/holosoma_retargeting/holosoma_retargeting/data_utils/human_body_prior
 

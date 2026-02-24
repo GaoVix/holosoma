@@ -87,6 +87,36 @@ def create_parser():
     )
     return parser
 
+def process_data(args, motion_list):
+
+    # script = project_root / "src" / "holosoma_retargeting" / "holosoma_retargeting" / "examples" / "robot_retarget.py"
+    script = project_root / "examples" / "robot_retarget.py"
+
+    processed = 0
+    for motion_path in tqdm(motion_list, desc="Retargeting files"):
+        motion_path = smpl_to_smplx(motion_path).replace('_poses.', '_stageii.').replace(".npy", ".pkl").replace(".pkl", ".npz").replace(' ', '_')
+
+        motion_path_rel = Path(*Path(motion_path).parts[-3:])
+        motion_path_abs = Path(args.processed_data_dir) / motion_path_rel
+
+        output = Path(args.output_path) / motion_path_rel
+        if output.exists():
+            print(f'Found retargeted data at {output}, continue ...')
+            continue
+
+        cmd = [
+            sys.executable, str(script),
+            "--data_path", f"{motion_path_abs}",
+            f"--task-type", 'robot_only',
+            "--data_format", 'smplx',
+            "--task-config.ground-range", "-10", "10",
+            f"--save_dir", f"{args.output_path}"
+        ]
+
+        run_command(cmd, project_root, "Retargeting")
+        processed += 1
+
+
 def retarget(args, motion_list):
 
     # script = project_root / "src" / "holosoma_retargeting" / "holosoma_retargeting" / "examples" / "robot_retarget.py"
