@@ -296,6 +296,8 @@ def main(cfg: Config):
         # subset_data_name = npz_path.parts[-3]
         # sub_name = npz_path.parts[-2]
         # output_file_path = os.path.join(cfg.output_folder, subset_data_name + "_" + sub_name + "_" + npz_path.name)
+        if not npz_file_path.exists():
+            continue
 
         data = load_ori_npz_file(npz_file_path)
         # gender = data["gender"]
