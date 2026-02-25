@@ -128,6 +128,7 @@ def retarget(args, motion_list):
     # script = project_root / "src" / "holosoma_retargeting" / "holosoma_retargeting" / "examples" / "robot_retarget.py"
     script = project_root / "examples" / "robot_retarget.py"
     times = []
+    errors = []
     processed = 0
     try:
         for motion_path in tqdm(motion_list, desc="Retargeting files"):
@@ -160,6 +161,7 @@ def retarget(args, motion_list):
             print(info)
     except Exception as e:
         print(f"An error occurred: {e}")
+        errors.append(str(e))
     finally:
         file_path = args.time_file
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -170,6 +172,9 @@ def retarget(args, motion_list):
             writer.writerow(header)
 
             for row in times:
+                writer.writerow(row)
+
+            for row in errors:
                 writer.writerow(row)
 
 
