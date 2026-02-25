@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 import yaml
 from tqdm import tqdm
+import time, csv
 
 project_root = Path(__file__).resolve().parent.parent
 
@@ -85,6 +86,11 @@ def create_parser():
         type=str,
         required=True,
     )
+    parser.add_argument(
+        "--time-file",
+        type=str,
+        required=True,
+    )
     return parser
 
 def process_data(args, motion_list):
@@ -121,30 +127,53 @@ def retarget(args, motion_list):
 
     # script = project_root / "src" / "holosoma_retargeting" / "holosoma_retargeting" / "examples" / "robot_retarget.py"
     script = project_root / "examples" / "robot_retarget.py"
-
+    times = []
     processed = 0
-    for motion_path in tqdm(motion_list, desc="Retargeting files"):
-        motion_path = smpl_to_smplx(motion_path).replace('_poses.', '_stageii.').replace(".npy", ".pkl").replace(".pkl", ".npz").replace(' ', '_')
+    try:
+        for motion_path in tqdm(motion_list, desc="Retargeting files"):
+            motion_path = smpl_to_smplx(motion_path).replace('_poses.', '_stageii.').replace(".npy", ".pkl").replace(".pkl", ".npz").replace(' ', '_')
 
-        motion_path_rel = Path(*Path(motion_path).parts[-3:])
-        motion_path_abs = Path(args.processed_data_dir) / motion_path_rel
+            motion_path_rel = Path(*Path(motion_path).parts[-3:])
+            motion_path_abs = Path(args.processed_data_dir) / motion_path_rel
 
-        output = Path(args.output_path) / motion_path_rel
-        if output.exists():
-            print(f'Found retargeted data at {output}, continue ...')
-            continue
+            output = Path(args.output_path) / motion_path_rel
+            if output.exists():
+                print(f'Found retargeted data at {output}, continue ...')
+                continue
 
-        cmd = [
-            sys.executable, str(script),
-            "--data_path", f"{motion_path_abs}",
-            f"--task-type", 'robot_only',
-            "--data_format", 'smplx',
-            "--task-config.ground-range", "-10", "10",
-            f"--save_dir", f"{args.output_path}"
-        ]
+            cmd = [
+                sys.executable, str(script),
+                "--data_path", f"{motion_path_abs}",
+                f"--task-type", 'robot_only',
+                "--data_format", 'smplx',
+                "--task-config.ground-range", "-10", "10",
+                f"--save_dir", f"{args.output_path}"
+            ]
+            s_time = time.time()
+            run_command(cmd, project_root, "Retargeting")
+            e_time = time.time()
+            processed += 1
 
-        run_command(cmd, project_root, "Retargeting")
-        processed += 1
+            rtgt_time =  e_time - s_time
+            info = [motion_path, rtgt_time]
+            times.append(info)
+            print(info)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        file_path = args.time_file
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+
+            header = ['Motion', 'Processing Time']
+            writer.writerow(header)
+
+            for row in times:
+                writer.writerow(row)
+
+
+        print(f'Finished, file saved to {file_path}')
 
 def load_motion_list(txt_path: Path) -> List[str]:
     """Load motion identifiers from txt file."""

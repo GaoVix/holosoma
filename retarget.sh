@@ -22,4 +22,5 @@ python src/holosoma_retargeting/holosoma_retargeting/data_utils/human_body_prior
 python src/holosoma_retargeting/holosoma_retargeting/examples/retarget.py \
     --processed-data-dir "$PROCESSED_DATA_DIR" \
     --output-path "$OUTPUT_DIR" \
-    --motion-list "$MOTION_LIST"
+    --motion-list "$MOTION_LIST" \
+    --time-file "$OUTPUT_DIR/time.csv"
