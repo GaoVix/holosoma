@@ -39,19 +39,19 @@ python src/holosoma_retargeting/holosoma_retargeting/data_utils/human_body_prior
 
 python src/holosoma_retargeting/holosoma_retargeting/examples/retarget.py \
     --processed-data-dir "/mnt/projects/holosoma/processed" \
-    --output-path "/mnt/projects/holosoma/retargeted" \
+    --output-path "/mnt/projects/holosoma/retargeted2" \
     --motion-list "lists/f0.txt" \
     --time-file "/mnt/projects/holosoma/retargeted/holosoma_f2.csv"
 
 python src/holosoma_retargeting/holosoma_retargeting/examples/retarget.py \
     --processed-data-dir "/mnt/projects/holosoma/processed" \
-    --output-path "/mnt/projects/holosoma/retargeted" \
+    --output-path "/mnt/projects/holosoma/retargeted2" \
     --motion-list "lists/f1.txt" \
     --time-file "/mnt/projects/holosoma/retargeted/holosoma_f1.csv"
 
 python src/holosoma_retargeting/holosoma_retargeting/examples/retarget.py \
     --processed-data-dir "/mnt/projects/holosoma/processed" \
-    --output-path "/mnt/projects/holosoma/retargeted" \
+    --output-path "/mnt/projects/holosoma/retargeted2" \
     --motion-list "lists/f2.txt" \
     --time-file "/mnt/projects/holosoma/retargeted/holosoma_f0.csv"
 
