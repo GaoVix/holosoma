@@ -23,4 +23,4 @@ python src/holosoma_retargeting/holosoma_retargeting/examples/retarget.py \
     --processed-data-dir "$PROCESSED_DATA_DIR" \
     --output-path "$OUTPUT_DIR" \
     --motion-list "$MOTION_LIST" \
-    --time-file "$OUTPUT_DIR/time.csv"
+    --time-file "$OUTPUT_DIR/time1.csv"

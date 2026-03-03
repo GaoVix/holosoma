@@ -164,6 +164,11 @@ def retarget(args, motion_list):
         errors.append(str(e))
     finally:
         file_path = args.time_file
+        file_path = str(args.time_file)
+        i = 1
+        while Path(file_path).exists():
+            file_path = file_path.replace(f"times{i}", f"times{i+1}")
+            i += 1
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, mode='w', newline='') as file:
             writer = csv.writer(file)
