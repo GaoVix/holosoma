@@ -179,8 +179,11 @@ def process_single_task(args):
     constants = create_task_constants(robot_config, motion_data_config, task_config, task_type)
 
     # Load motion data
+    # human_joints, object_poses, smpl_scale = load_motion_data(
+    #     task_type, data_format, Path(file_path).parent, task_name, constants, motion_data_config
+    # )
     human_joints, object_poses, smpl_scale = load_motion_data(
-        task_type, data_format, Path(file_path).parent, task_name, constants, motion_data_config
+        task_type, data_format, file_path, task_name, constants, motion_data_config
     )
 
     # Preserve original data (preprocess_motion_data modifies them in place)
