@@ -86,7 +86,7 @@ def find_files(data_dir: Path, data_format: str, object_name: str | None = None)
         return sorted(files)
     if data_format == "smplx":
         # SMPL-X: .npz files in root directory
-        files = [str(p) for p in data_dir.glob("*.npz")]
+        files = [str(p) for p in data_dir.rglob("*.npz")]
         return sorted(files)
     # For other data format, default to be consistent with SMPL-X
     files = [str(p) for p in data_dir.glob("*.npz")]
